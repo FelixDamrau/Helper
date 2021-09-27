@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Helper.Core": {
+      "commandName": "Project",
+      "commandLineArgs": "--package"
+    }
+  }
+}
