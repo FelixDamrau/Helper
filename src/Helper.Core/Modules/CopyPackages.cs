@@ -1,4 +1,6 @@
 ﻿using Helper.Core.Model;
+using Humanizer;
+using System;
 using System.IO;
 
 namespace Helper.Core.Modules
@@ -7,15 +9,27 @@ namespace Helper.Core.Modules
     {
         public ModuleResult Run()
         {
-            var directory = Directory.GetCurrentDirectory();
-            var packageFiles = Directory.GetFiles(directory, "*.nupkg", SearchOption.AllDirectories);
-            
-            foreach (var file in packageFiles)
+            try
             {
-                var destinationFile = Path.Combine("C:\\temp\\mypackages\\", Path.GetFileName(file));
-                File.Copy(file, destinationFile, true);
+                var directory = Directory.GetCurrentDirectory();
+                var packageFiles = Directory.GetFiles(directory, "*.nupkg", SearchOption.AllDirectories);
+                var count = packageFiles.Length;
+
+                Console.WriteLine($"Found {"package".ToQuantity(count)}.");
+
+                foreach (var filePath in packageFiles)
+                {
+                    var fileName = Path.GetFileName(filePath);
+                    Console.WriteLine($"Copy nuget file: {fileName}");
+                    var destinationFile = Path.Combine("C:\\temp\\mypackages\\", fileName);
+                    File.Copy(filePath, destinationFile, true);
+                }
+                return new ModuleResult(true, "packages".ToQuantity(count) + " copied successfully.");
             }
-            return new ModuleResult(true, "yo");
+            catch (Exception exception)
+            {
+                return new ModuleResult(false, $"Copying packages failed. [{exception.Message}]");
+            }
         }
     }
 }
