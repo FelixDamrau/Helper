@@ -2,7 +2,10 @@
   "profiles": {
     "Helper.Core": {
       "commandName": "Project",
-      "commandLineArgs": "--package"
+      "commandLineArgs": "--setup foo",
+      "environmentVariables": {
+        "DEV_ENVIRONMENT": "Development"
+      }
     }
   }
 }

@@ -1,7 +1,5 @@
-﻿namespace Helper.Core.Model
+﻿namespace Helper.Core.Model;
+public interface IModule
 {
-    public interface IModule
-    {
-        public ModuleResult Run();
-    }
+    public ModuleResult Run();
 }
