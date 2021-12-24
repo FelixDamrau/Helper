@@ -6,7 +6,7 @@ public class AppSettings
     /// <summary>
     /// The absolute path of the local package cache.
     /// </summary>
-    public string LocalPackageCache { get; set; } = "Net set";
+    public string LocalPackageCache { get; set; } = "Not set";
 
     /// <summary>
     /// The absolute path that identifies the setup publish directory.
@@ -26,7 +26,7 @@ public class AppSettings
     {
         var env = Environment.GetEnvironmentVariable("DEV_ENVIRONMENT");
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
             .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: false)
             .Build();
 
