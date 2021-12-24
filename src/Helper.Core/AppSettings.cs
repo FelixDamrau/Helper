@@ -26,7 +26,7 @@ public class AppSettings
     {
         var env = Environment.GetEnvironmentVariable("DEV_ENVIRONMENT");
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
             .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: false)
             .Build();
 
