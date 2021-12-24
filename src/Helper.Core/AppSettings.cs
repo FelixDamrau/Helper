@@ -6,7 +6,7 @@ public class AppSettings
     /// <summary>
     /// The absolute path of the local package cache.
     /// </summary>
-    public string LocalPackageCache { get; set; } = "Net set";
+    public string LocalPackageCache { get; set; } = "Not set";
 
     /// <summary>
     /// The absolute path that identifies the setup publish directory.

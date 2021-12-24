@@ -12,15 +12,25 @@ class Program
         var rootCommand = new RootCommand("FD Helper App")
             {
                 new Option<bool>(
-                    alias: "--package",
+                    aliases: new[] { "--package", "-p" },
                     getDefaultValue: () => false,
                     description: "Copy all nuget packages to the local package cache"),
                 new Option<string>(
-                    alias: "--setup",
+                    aliases: new[] { "--setup", "-s" },
                     description: "Zip setup and copy to publish directory")
             };
+        rootCommand.SetHandler(GetCommandHandler(appSettings));
 
-        rootCommand.Handler = CommandHandler.Create<bool, string>((package, setup) =>
+        return rootCommand.Invoke(args);
+    }
+
+    private static IModule CopyPackages(AppSettings appSettings) => new CopyPackages(appSettings);
+    private static IModule PublishSetup(AppSettings appSettings, string setupName) => new PublishSetup(appSettings, setupName);
+    private static IModule NotFound() => new InvalidOption();
+
+    private static Action<bool, string> GetCommandHandler(AppSettings appSettings)
+    {
+        return (bool package, string setup) =>
         {
             var module = (package, setup) switch
             {
@@ -33,12 +43,6 @@ class Program
 
             Console.Write(result.Valid ? "SUCCESS" : "FAIL");
             Console.WriteLine($" - {result.Message}");
-        });
-
-        return rootCommand.Invoke(args);
+        };
     }
-
-    private static IModule CopyPackages(AppSettings appSettings) => new CopyPackages(appSettings);
-    private static IModule PublishSetup(AppSettings appSettings, string setupName) => new PublishSetup(appSettings, setupName);
-    private static IModule NotFound() => new InvalidOption();
 }
