@@ -27,13 +27,13 @@ jobs:
       shell: bash
       run: |
         tag=$(git describe --tags --abbrev=0)
-        release_name="Helper-$tag"
+        release_name="ReleaseHelper-$tag"
         cd ./src/Helper/bin/publish
         zip -r "${release_name}.zip" . -i "./*"
 
     - name: Publish 🚚
       uses: FelixDamrau/action-gh-release@v1
       with:
-        files: "**/Helper*"
+        files: "**/ReleaseHelper*"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
