@@ -6,10 +6,10 @@ using Humanizer;
 
 namespace Develix.Helper.Modules;
 
-public class DependencyCheck(AppSettings appSettings) : IModule
+public class DependencyCheck(string workingDirectory) : IModule
 {
-    private readonly AppSettings appSettings = appSettings;
     private readonly JsonSerializerOptions serializerOptions = new() { PropertyNameCaseInsensitive = true, };
+    private readonly string workingDirectory = workingDirectory;
 
     public ModuleResult Run()
     {
@@ -18,7 +18,7 @@ public class DependencyCheck(AppSettings appSettings) : IModule
         {
             FileName = "dotnet.exe",
             Arguments = "list package --include-transitive --format json",
-            WorkingDirectory = appSettings.WorkingDirectory,
+            WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
         };
         process.StartInfo = startInfo;
