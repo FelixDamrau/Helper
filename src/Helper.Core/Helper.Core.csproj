@@ -1,24 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <OutputType>Exe</OutputType>
-    <EnableDefaultContentItems>false</EnableDefaultContentItems>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Helper</AssemblyName>
-    <Version>0.2.0</Version>
+    <RootNameSpace>Develix.Helper</RootNameSpace>
+    <Version>0.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Develix.Essentials" Version="1.0.0-alpha003" />
+    <PackageReference Include="Develix.Essentials" Version="1.1.2" />
     <PackageReference Include="Humanizer.Core" Version="2.*" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0-*" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
   </ItemGroup>
 
