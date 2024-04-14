@@ -1,9 +1,10 @@
-﻿using Helper.Core.Model;
-using Helper.Core.Modules;
+﻿using Develix.Helper.Model;
+using Develix.Helper.Modules;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 
-namespace Helper.Core;
+namespace Develix.Helper;
+
 class Program
 {
     static int Main(string[] args)
@@ -22,23 +23,24 @@ class Program
 
         rootCommand.Handler = CommandHandler.Create<bool, string>((package, setup) =>
         {
-            var module = (package, setup) switch
+            IModule module = (package, setup) switch
             {
                 (true, _) => CopyPackages(appSettings),
-                (_, _) when !string.IsNullOrWhiteSpace(setup) => PublishSetup(appSettings, setup),
+                (_, not "") => PublishSetup(appSettings, setup),
                 _ => NotFound(),
             };
 
             var result = module.Run();
-
-            Console.Write(result.Valid ? "SUCCESS" : "FAIL");
-            Console.WriteLine($" - {result.Message}");
+            var message = result.Valid
+                ? $"SUCCESS -- {result.Message}"
+                : $"FAIL -- {result.Message}";
+            Console.WriteLine(message);
         });
 
         return rootCommand.Invoke(args);
     }
 
-    private static IModule CopyPackages(AppSettings appSettings) => new CopyPackages(appSettings);
-    private static IModule PublishSetup(AppSettings appSettings, string setupName) => new PublishSetup(appSettings, setupName);
-    private static IModule NotFound() => new InvalidOption();
+    private static CopyPackages CopyPackages(AppSettings appSettings) => new(appSettings);
+    private static PublishSetup PublishSetup(AppSettings appSettings, string setupName) => new(appSettings, setupName);
+    private static InvalidOption NotFound() => new();
 }

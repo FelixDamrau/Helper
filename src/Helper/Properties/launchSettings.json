@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Helper": {
+      "commandName": "Project",
+      "commandLineArgs": "--help",
+      "workingDirectory": ".\\bin\\Debug\\net8.0"
+    }
+  }
+}

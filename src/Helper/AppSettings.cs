@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Helper.Core;
+namespace Develix.Helper;
 public class AppSettings
 {
     /// <summary>
@@ -24,10 +24,8 @@ public class AppSettings
 
     public static AppSettings Create()
     {
-        var env = Environment.GetEnvironmentVariable("DEV_ENVIRONMENT");
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
             .Build();
 
         var settings = new AppSettings();

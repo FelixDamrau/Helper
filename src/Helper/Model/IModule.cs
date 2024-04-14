@@ -1,4 +1,5 @@
-﻿namespace Helper.Core.Model;
+﻿namespace Develix.Helper.Model;
+
 public interface IModule
 {
     public ModuleResult Run();
