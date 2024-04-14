@@ -31,7 +31,7 @@ class Program
             {
                 (true, _, _) => CopyPackages(appSettings),
                 (_, not "", _) => PublishSetup(appSettings, setup),
-                (_,_, true) => CheckDependencies(),
+                (_,_, true) => CheckDependencies(appSettings),
                 _ => NotFound(),
             };
 
@@ -48,6 +48,6 @@ class Program
     private static CopyPackages CopyPackages(AppSettings appSettings) => new(appSettings);
     private static PublishSetup PublishSetup(AppSettings appSettings, string setupName) => new(appSettings, setupName);
 
-    private static DependencyCheck CheckDependencies() => new DependencyCheck();
+    private static DependencyCheck CheckDependencies(AppSettings appSettings) => new DependencyCheck(appSettings);
     private static InvalidOption NotFound() => new();
 }

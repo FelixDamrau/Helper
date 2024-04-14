@@ -19,6 +19,11 @@ public class AppSettings
     /// </summary>
     public string SetupDirectoryIdentifier { get; init; } = "Not set";
 
+    /// <summary>
+    /// The path to the working directory. Usually only used for debugging purposes.
+    /// </summary>
+    public string WorkingDirectory { get; init; } = "Not set";
+
     private AppSettings()
     {
     }

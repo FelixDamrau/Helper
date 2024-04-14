@@ -1,10 +1,13 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using Develix.Helper.Model;
 
 namespace Develix.Helper.Modules;
 
-internal class DependencyCheck : IModule
+internal class DependencyCheck(AppSettings appSettings) : IModule
 {
+    private readonly AppSettings appSettings = appSettings;
+
     public ModuleResult Run()
     {
         var process = new Process();
@@ -12,14 +15,16 @@ internal class DependencyCheck : IModule
         {
             FileName = "dotnet.exe",
             Arguments = "list package --format json",
+            WorkingDirectory = appSettings.WorkingDirectory,
             RedirectStandardOutput = true,
-            RedirectStandardError = true,
         };
         process.StartInfo = startInfo;
         process.Start();
         var message = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        var valid = process.ExitCode == 0;
-        return new(valid, message);
+        if (process.ExitCode != 0)
+            return new(false, $"Exit code is {process.ExitCode}");
+
+        return new(true, message);
     }
 }
