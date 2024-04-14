@@ -1,11 +1,9 @@
 {
   "profiles": {
-    "Helper.Core": {
+    "Helper": {
       "commandName": "Project",
-      "commandLineArgs": "--setup foo",
-      "environmentVariables": {
-        "DEV_ENVIRONMENT": "Development"
-      }
+      "commandLineArgs": "--help",
+      "workingDirectory": ".\\bin\\Debug\\net8.0"
     }
   }
 }
