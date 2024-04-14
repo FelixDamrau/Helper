@@ -18,15 +18,20 @@ class Program
                     description: "Copy all nuget packages to the local package cache"),
                 new Option<string>(
                     alias: "--setup",
-                    description: "Zip setup and copy to publish directory")
+                    description: "Zip setup and copy to publish directory"),
+                new Option<bool>(
+                    alias: "--deps",
+                    getDefaultValue: () => false,
+                    description: "Lists any packages that resolve to different versions across all projects.")
             };
 
-        rootCommand.Handler = CommandHandler.Create<bool, string>((package, setup) =>
+        rootCommand.Handler = CommandHandler.Create<bool, string, bool>((package, setup, deps) =>
         {
-            IModule module = (package, setup) switch
+            IModule module = (package, setup, deps) switch
             {
-                (true, _) => CopyPackages(appSettings),
-                (_, not "") => PublishSetup(appSettings, setup),
+                (true, _, _) => CopyPackages(appSettings),
+                (_, not "", _) => PublishSetup(appSettings, setup),
+                (_,_, true) => CheckDependencies(),
                 _ => NotFound(),
             };
 
@@ -42,5 +47,7 @@ class Program
 
     private static CopyPackages CopyPackages(AppSettings appSettings) => new(appSettings);
     private static PublishSetup PublishSetup(AppSettings appSettings, string setupName) => new(appSettings, setupName);
+
+    private static DependencyCheck CheckDependencies() => new DependencyCheck();
     private static InvalidOption NotFound() => new();
 }
