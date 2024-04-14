@@ -1,4 +1,4 @@
-# Helper
+# Dvelix.Helper
 
 Small console application that tries to simplify the daily developer life.
 

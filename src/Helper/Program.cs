@@ -10,7 +10,7 @@ class Program
     static int Main(string[] args)
     {
         var appSettings = AppSettings.Create();
-        var rootCommand = new RootCommand("FD Helper App")
+        var rootCommand = new RootCommand("Develix Helper App")
             {
                 new Option<bool>(
                     alias: "--package",
