@@ -20,8 +20,8 @@ jobs:
     - name: Restore dependencies 🛠
       run: dotnet restore
 
-    - name: Build 🔧
-      run: dotnet publish --no-restore ./src/Helper/Helper.csproj -o ./src/Helper/bin/publish -c Release -r win-x64 -p:PublishTrimmed=True -p:TrimMode=Link
+    - name: Publish ✨
+      run: dotnet publish --no-restore --no-self-contained ./src/Helper/Helper.csproj -o ./src/Helper/bin/publish -c Release -r win-x64 -p:PublishTrimmed=True -p:TrimMode=Link -p:PublishSingleFile=true
 
     - name: Pack 🗜
       shell: bash
