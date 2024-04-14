@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="appsettings.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <None Include="appsettings.json" CopyToOutputDirectory="Always" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
 </Project>
