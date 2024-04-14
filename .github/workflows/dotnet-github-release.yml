@@ -6,28 +6,32 @@ on:
 jobs:
   release:
     name: Build Release
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout 🛎
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+
     - name: Setup .NET net 🐱‍💻
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
-        include-prerelease: true
+        dotnet-version: 8.0.x
+
     - name: Restore dependencies 🛠
       run: dotnet restore
+
     - name: Build 🔧
       run: dotnet publish --no-restore .\src\Helper.Core\Helper.Core.csproj -o .\src\Helper.Core\bin\publish -c Release -r win-x64 -p:PublishTrimmed=True -p:TrimMode=Link
+
     - name: Pack 🗜
       shell: bash
       run: |
         tag=$(git describe --tags --abbrev=0)
         release_name="Helper-$tag"
         7z a -tzip "${release_name}.zip" ".\src\Helper.Core\bin\publish\*"
+
     - name: Publish 🚚
-      uses: softprops/action-gh-release@v1
+      uses: FelixDamrau/action-gh-release@v1
       with:
         files: "Helper*"
       env:
