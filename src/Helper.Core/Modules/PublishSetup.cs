@@ -4,18 +4,11 @@ using Develix.Helper.Model;
 
 namespace Develix.Helper.Modules;
 
-public class PublishSetup : IModule
+public class PublishSetup(AppSettings appSettings, string setupName) : IModule
 {
-    private readonly string setupDirectoryIdentifier;
-    private readonly string publishSetupRoot;
-    private readonly string setupName;
-
-    public PublishSetup(AppSettings appSettings, string setupName)
-    {
-        setupDirectoryIdentifier = appSettings.SetupDirectoryIdentifier;
-        publishSetupRoot = appSettings.PublishSetupRoot;
-        this.setupName = setupName;
-    }
+    private readonly string setupDirectoryIdentifier = appSettings.SetupDirectoryIdentifier;
+    private readonly string publishSetupRoot = appSettings.PublishSetupRoot;
+    private readonly string setupName = setupName;
 
     public ModuleResult Run()
     {
