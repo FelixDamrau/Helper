@@ -1,45 +1,42 @@
-﻿using Helper.Core.Model;
+﻿using Develix.Helper.Model;
 using Humanizer;
-using System;
-using System.IO;
 
-namespace Helper.Core.Modules
+namespace Develix.Helper.Modules;
+
+public class CopyPackages : IModule
 {
-    public class CopyPackages : IModule
+    private readonly string localPackageCache;
+
+    public CopyPackages(AppSettings appSettings)
     {
-        private readonly string localPackageCache;
+        localPackageCache = appSettings.LocalPackageCache;
+    }
 
-        public CopyPackages(AppSettings appSettings)
+    public ModuleResult Run()
+    {
+        try
         {
-            localPackageCache = appSettings.LocalPackageCache;
+            if (!Directory.Exists(localPackageCache))
+                return new ModuleResult(false, $"The directory of the local package cache '{localPackageCache}' does not exist!");
+
+            var directory = Directory.GetCurrentDirectory();
+            var packageFiles = Directory.GetFiles(directory, "*.nupkg", SearchOption.AllDirectories);
+            var count = packageFiles.Length;
+
+            Console.WriteLine($"Found {"package".ToQuantity(count)}.");
+
+            foreach (var filePath in packageFiles)
+            {
+                var fileName = Path.GetFileName(filePath);
+                Console.WriteLine($"Copy nuget file: {fileName}");
+                var destinationFile = Path.Combine(localPackageCache, fileName);
+                File.Copy(filePath, destinationFile, true);
+            }
+            return new ModuleResult(true, "package".ToQuantity(count) + " copied successfully.");
         }
-
-        public ModuleResult Run()
+        catch (Exception exception)
         {
-            try
-            {
-                if (!Directory.Exists(localPackageCache))
-                    return new ModuleResult(false, $"The directory of the local package cache '{localPackageCache}' does not exist!");
-
-                var directory = Directory.GetCurrentDirectory();
-                var packageFiles = Directory.GetFiles(directory, "*.nupkg", SearchOption.AllDirectories);
-                var count = packageFiles.Length;
-
-                Console.WriteLine($"Found {"package".ToQuantity(count)}.");
-
-                foreach (var filePath in packageFiles)
-                {
-                    var fileName = Path.GetFileName(filePath);
-                    Console.WriteLine($"Copy nuget file: {fileName}");
-                    var destinationFile = Path.Combine(localPackageCache, fileName);
-                    File.Copy(filePath, destinationFile, true);
-                }
-                return new ModuleResult(true, "package".ToQuantity(count) + " copied successfully.");
-            }
-            catch (Exception exception)
-            {
-                return new ModuleResult(false, $"Copying packages failed. [{exception.Message}]");
-            }
+            return new ModuleResult(false, $"Copying packages failed. [{exception.Message}]");
         }
     }
 }

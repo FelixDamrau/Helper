@@ -1,8 +1,9 @@
 ﻿using System.IO.Compression;
 using Develix.Essentials.Core;
-using Helper.Core.Model;
+using Develix.Helper.Model;
 
-namespace Helper.Core.Modules;
+namespace Develix.Helper.Modules;
+
 public class PublishSetup : IModule
 {
     private readonly string setupDirectoryIdentifier;
@@ -37,8 +38,8 @@ public class PublishSetup : IModule
         var root = Directory.GetCurrentDirectory();
         var subDirectories = Directory.GetDirectories(root, "*", SearchOption.AllDirectories);
         var setupDirectory = subDirectories.FirstOrDefault(d => d.EndsWith(setupDirectoryIdentifier, StringComparison.OrdinalIgnoreCase));
-        return setupDirectory is null 
-            ? Result.Fail<string>($"Setup directory '{setupDirectoryIdentifier}' not found! (Directories searched: [{string.Join(", ", subDirectories)}]") 
+        return setupDirectory is null
+            ? Result.Fail<string>($"Setup directory '{setupDirectoryIdentifier}' not found! (Directories searched: [{string.Join(", ", subDirectories)}]")
             : Result.Ok(setupDirectory);
     }
 

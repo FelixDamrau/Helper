@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Helper.Core;
+namespace Develix.Helper;
 public class AppSettings
 {
     /// <summary>
