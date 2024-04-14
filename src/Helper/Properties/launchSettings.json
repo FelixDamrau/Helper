@@ -2,7 +2,7 @@
   "profiles": {
     "Helper": {
       "commandName": "Project",
-      "commandLineArgs": "--deps",
+      "commandLineArgs": "--help",
       "workingDirectory": ".\\bin\\Debug\\net8.0"
     }
   }

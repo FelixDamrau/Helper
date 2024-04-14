@@ -3,7 +3,7 @@ using Spectre.Console;
 
 namespace Develix.Helper.Modules;
 
-internal partial class DependencyCheckResolver
+public partial class DependencyCheckResolver
 {
     private readonly HashSet<PackageData> packageData = [];
 

@@ -6,7 +6,7 @@ using Humanizer;
 
 namespace Develix.Helper.Modules;
 
-internal class DependencyCheck(AppSettings appSettings) : IModule
+public class DependencyCheck(AppSettings appSettings) : IModule
 {
     private readonly AppSettings appSettings = appSettings;
     private readonly JsonSerializerOptions serializerOptions = new() { PropertyNameCaseInsensitive = true, };
