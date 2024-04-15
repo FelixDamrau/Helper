@@ -45,16 +45,33 @@ public partial class DependencyCheckResolver
 
         foreach (var conflict in conflictedPackages)
         {
-            table.AddRow(conflict.Key, string.Empty, string.Empty, string.Empty);
+            table.AddRow(conflict.Key.EscapeMarkup(), string.Empty, string.Empty, string.Empty);
             foreach (var data in conflict)
             {
                 var projectFile = new FileInfo(data.Project);
-                table.AddRow(string.Empty, projectFile.Name, data.Version, data.AdditionalInfo);
+                table.AddRow(string.Empty, projectFile.Name.EscapeMarkup(), data.Version.EscapeMarkup(), data.AdditionalInfo.EscapeMarkup());
             }
         }
 
         return table;
     }
 
-    private record PackageData(string Project, string Id, string Version, string AdditionalInfo);
+    private sealed class PackageData(string project, string id, string version, string additionalInfo) : IEquatable<PackageData> 
+    {
+        public string Project { get; } = project;
+        public string Id { get; } = id;
+        public string Version { get; } = version;
+        public string AdditionalInfo { get; } = additionalInfo;
+
+        public bool Equals(PackageData? other)
+        {
+            return other is not null
+                && Id == other.Id 
+                && Version == other.Version;
+        }
+
+        public override bool Equals(object? obj) => obj is PackageData packageData && Equals(packageData);
+
+        public override int GetHashCode() => HashCode.Combine(Id, Version);
+    }
 }
