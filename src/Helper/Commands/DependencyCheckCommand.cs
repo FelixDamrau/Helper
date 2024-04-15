@@ -2,16 +2,25 @@
 using System.Text.Json;
 using Develix.Helper.Model;
 using Develix.Helper.Model.Dependencies;
+using Develix.Helper.Settings;
 using Humanizer;
+using Spectre.Console;
+using Spectre.Console.Cli;
 
-namespace Develix.Helper.Modules;
+namespace Develix.Helper.Commands;
 
-public class DependencyCheck(string workingDirectory) : IModule
+public class DependencyCheckCommand : Command<DependencyCheckSettings>
 {
     private readonly JsonSerializerOptions serializerOptions = new() { PropertyNameCaseInsensitive = true, };
-    private readonly string workingDirectory = workingDirectory;
 
-    public ModuleResult Run()
+    public override int Execute(CommandContext context, DependencyCheckSettings settings)
+    {
+        var result = Run(settings.WorkingDirectory ?? ".");
+        AnsiConsole.WriteLine(result.Message.EscapeMarkup());
+        return result.Valid ? 0 : -1;
+    }
+
+    private ModuleResult Run(string workingDirectory)
     {
         var process = new Process();
         var startInfo = new ProcessStartInfo()
