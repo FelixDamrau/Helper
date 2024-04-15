@@ -56,7 +56,7 @@ public partial class DependencyCheckResolver
         return table;
     }
 
-    private class PackageData(string project, string id, string version, string additionalInfo) : IEquatable<PackageData> 
+    private sealed class PackageData(string project, string id, string version, string additionalInfo) : IEquatable<PackageData> 
     {
         public string Project { get; } = project;
         public string Id { get; } = id;
