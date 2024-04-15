@@ -45,11 +45,11 @@ public partial class DependencyCheckResolver
 
         foreach (var conflict in conflictedPackages)
         {
-            table.AddRow(conflict.Key, string.Empty, string.Empty, string.Empty);
+            table.AddRow(conflict.Key.EscapeMarkup(), string.Empty, string.Empty, string.Empty);
             foreach (var data in conflict)
             {
                 var projectFile = new FileInfo(data.Project);
-                table.AddRow(string.Empty, projectFile.Name, data.Version, data.AdditionalInfo);
+                table.AddRow(string.Empty, projectFile.Name.EscapeMarkup(), data.Version.EscapeMarkup(), data.AdditionalInfo.EscapeMarkup());
             }
         }
 
