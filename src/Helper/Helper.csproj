@@ -9,7 +9,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <AssemblyName>Helper</AssemblyName>
     <RootNameSpace>Develix.Helper</RootNameSpace>
-    <Version>0.4.3</Version>
+    <Version>0.4.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
