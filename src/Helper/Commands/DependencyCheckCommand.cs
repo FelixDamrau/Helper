@@ -15,18 +15,21 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
     public override int Execute(CommandContext context, DependencyCheckSettings settings)
     {
-        var result = Run(settings.WorkingDirectory ?? ".");
+        var result = Run(settings.WorkingDirectory ?? ".", settings.ExcludeProjects, settings.Framework);
         AnsiConsole.WriteLine(result.Message.EscapeMarkup());
         return result.Valid ? 0 : -1;
     }
 
-    private ModuleResult Run(string workingDirectory)
+    private ModuleResult Run(string workingDirectory, string? excludeProjects, string? framework)
     {
         var process = new Process();
+        var frameworkFlag = framework is null
+            ? null
+            : $" --framework {framework}";
         var startInfo = new ProcessStartInfo()
         {
             FileName = "dotnet.exe",
-            Arguments = "list package --include-transitive --format json",
+            Arguments = $"list package{frameworkFlag} --include-transitive --format json",
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
         };
@@ -40,12 +43,16 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
         var dependencyCheckModel = JsonSerializer.Deserialize<DependencyCheckModel>(listPackageJson, serializerOptions)
             ?? throw new InvalidOperationException($"Could not deserialize data model!");
         var res = new DependencyCheckResolver();
-        foreach (var project in dependencyCheckModel.Projects ?? [])
+        var projects = dependencyCheckModel.Projects ?? [];
+        var relevantProjects = excludeProjects is null
+            ? projects
+            : projects.Where(p => !p.Path.Contains(excludeProjects));
+        foreach (var project in relevantProjects)
         {
-            foreach (var package in project.Frameworks.First().TopLevelPackages ?? [])
+            foreach (var package in project.Frameworks?.First().TopLevelPackages ?? [])
                 res.Add(project, package);
 
-            foreach (var package in project.Frameworks.First().TransitivePackages ?? [])
+            foreach (var package in project.Frameworks?.First().TransitivePackages ?? [])
                 res.Add(project, package);
         }
 
