@@ -14,7 +14,7 @@ public class DependencyCheckSettings : CommandSettings
     public string? ExcludeProjects { get; set; }
 
     [CommandOption("-f|--framework <framework>")]
-    [Description("Considers only the packages applicable for the specified target framework.")]
+    [Description("Considers only the packages applicable for the specified target framework")]
     public string? Framework { get; set; }
     
 }
