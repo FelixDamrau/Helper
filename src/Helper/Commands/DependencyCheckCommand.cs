@@ -15,22 +15,14 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
     public override int Execute(CommandContext context, DependencyCheckSettings settings)
     {
-        var result = Run(settings.WorkingDirectory ?? ".");
+        var result = Run(settings.WorkingDirectory ?? ".", settings.ExcludeProjects, settings.Framework);
         AnsiConsole.WriteLine(result.Message.EscapeMarkup());
         return result.Valid ? 0 : -1;
     }
 
-    private ModuleResult Run(string workingDirectory)
+    private ModuleResult Run(string workingDirectory, string? excludeProjects, string? framework)
     {
-        var process = new Process();
-        var startInfo = new ProcessStartInfo()
-        {
-            FileName = "dotnet.exe",
-            Arguments = "list package --include-transitive --format json",
-            WorkingDirectory = workingDirectory,
-            RedirectStandardOutput = true,
-        };
-        process.StartInfo = startInfo;
+        var process = InitProcess(workingDirectory, framework);
         process.Start();
         var listPackageJson = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
@@ -39,16 +31,8 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
         var dependencyCheckModel = JsonSerializer.Deserialize<DependencyCheckModel>(listPackageJson, serializerOptions)
             ?? throw new InvalidOperationException($"Could not deserialize data model!");
-        var res = new DependencyCheckResolver();
-        foreach (var project in dependencyCheckModel.Projects ?? [])
-        {
-            foreach (var package in project.Frameworks.First().TopLevelPackages ?? [])
-                res.Add(project, package);
-
-            foreach (var package in project.Frameworks.First().TransitivePackages ?? [])
-                res.Add(project, package);
-        }
-
+        
+        var res = InitResolver(excludeProjects, dependencyCheckModel);
         var conflictCount = res.ShowConflicts();
 
         var message = $"""
@@ -56,5 +40,41 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
             {"conflict".ToQuantity(conflictCount)} found.
             """;
         return new(true, message);
+    }
+
+    private static Process InitProcess(string workingDirectory, string? framework)
+    {
+        var process = new Process();
+        var frameworkFlag = framework is null
+            ? null
+            : $" --framework {framework}";
+        var startInfo = new ProcessStartInfo()
+        {
+            FileName = "dotnet.exe",
+            Arguments = $"list package{frameworkFlag} --include-transitive --format json",
+            WorkingDirectory = workingDirectory,
+            RedirectStandardOutput = true,
+        };
+        process.StartInfo = startInfo;
+        return process;
+    }
+
+    private static DependencyCheckResolver InitResolver(string? excludeProjects, DependencyCheckModel dependencyCheckModel)
+    {
+        var resolver = new DependencyCheckResolver();
+        var projects = dependencyCheckModel.Projects ?? [];
+        var relevantProjects = excludeProjects is null
+            ? projects
+            : projects.Where(p => !p.Path.Contains(excludeProjects));
+        foreach (var project in relevantProjects)
+        {
+            foreach (var package in project.Frameworks?.First().TopLevelPackages ?? [])
+                resolver.Add(project, package);
+
+            foreach (var package in project.Frameworks?.First().TransitivePackages ?? [])
+                resolver.Add(project, package);
+        }
+
+        return resolver;
     }
 }
