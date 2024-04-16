@@ -22,6 +22,28 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
     private ModuleResult Run(string workingDirectory, string? excludeProjects, string? framework)
     {
+        var process = InitProcess(workingDirectory, framework);
+        process.Start();
+        var listPackageJson = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        if (process.ExitCode != 0)
+            return new(false, $"Exit code is {process.ExitCode}");
+
+        var dependencyCheckModel = JsonSerializer.Deserialize<DependencyCheckModel>(listPackageJson, serializerOptions)
+            ?? throw new InvalidOperationException($"Could not deserialize data model!");
+        
+        var res = InitResolver(excludeProjects, dependencyCheckModel);
+        var conflictCount = res.ShowConflicts();
+
+        var message = $"""
+            {"project".ToQuantity(dependencyCheckModel.Projects?.Count ?? 0)} analyzed.
+            {"conflict".ToQuantity(conflictCount)} found.
+            """;
+        return new(true, message);
+    }
+
+    private static Process InitProcess(string workingDirectory, string? framework)
+    {
         var process = new Process();
         var frameworkFlag = framework is null
             ? null
@@ -34,15 +56,12 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
             RedirectStandardOutput = true,
         };
         process.StartInfo = startInfo;
-        process.Start();
-        var listPackageJson = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-        if (process.ExitCode != 0)
-            return new(false, $"Exit code is {process.ExitCode}");
+        return process;
+    }
 
-        var dependencyCheckModel = JsonSerializer.Deserialize<DependencyCheckModel>(listPackageJson, serializerOptions)
-            ?? throw new InvalidOperationException($"Could not deserialize data model!");
-        var res = new DependencyCheckResolver();
+    private static DependencyCheckResolver InitResolver(string? excludeProjects, DependencyCheckModel dependencyCheckModel)
+    {
+        var resolver = new DependencyCheckResolver();
         var projects = dependencyCheckModel.Projects ?? [];
         var relevantProjects = excludeProjects is null
             ? projects
@@ -50,18 +69,12 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
         foreach (var project in relevantProjects)
         {
             foreach (var package in project.Frameworks?.First().TopLevelPackages ?? [])
-                res.Add(project, package);
+                resolver.Add(project, package);
 
             foreach (var package in project.Frameworks?.First().TransitivePackages ?? [])
-                res.Add(project, package);
+                resolver.Add(project, package);
         }
 
-        var conflictCount = res.ShowConflicts();
-
-        var message = $"""
-            {"project".ToQuantity(dependencyCheckModel.Projects?.Count ?? 0)} analyzed.
-            {"conflict".ToQuantity(conflictCount)} found.
-            """;
-        return new(true, message);
+        return resolver;
     }
 }
