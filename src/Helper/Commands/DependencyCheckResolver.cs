@@ -1,7 +1,7 @@
 ﻿using Develix.Helper.Model.Dependencies;
 using Spectre.Console;
 
-namespace Develix.Helper.Modules;
+namespace Develix.Helper.Commands;
 
 public partial class DependencyCheckResolver
 {
@@ -56,7 +56,7 @@ public partial class DependencyCheckResolver
         return table;
     }
 
-    private sealed class PackageData(string project, string id, string version, string additionalInfo) : IEquatable<PackageData> 
+    private sealed class PackageData(string project, string id, string version, string additionalInfo) : IEquatable<PackageData>
     {
         public string Project { get; } = project;
         public string Id { get; } = id;
@@ -66,7 +66,7 @@ public partial class DependencyCheckResolver
         public bool Equals(PackageData? other)
         {
             return other is not null
-                && Id == other.Id 
+                && Id == other.Id
                 && Version == other.Version;
         }
 

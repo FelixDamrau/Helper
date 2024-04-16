@@ -1,18 +1,25 @@
 ﻿using Develix.Helper.Model;
+using Develix.Helper.Settings;
 using Humanizer;
+using Spectre.Console;
+using Spectre.Console.Cli;
 
-namespace Develix.Helper.Modules;
+namespace Develix.Helper.Commands;
 
-public class CopyPackages : IModule
+public class CopyPackagesCommand : Command<CopyPackagesSettings>
 {
     private readonly string localPackageCache;
 
-    public CopyPackages(AppSettings appSettings)
+    public CopyPackagesCommand(AppSettings appSettings) => localPackageCache = appSettings.LocalPackageCache;
+
+    public override int Execute(CommandContext context, CopyPackagesSettings settings)
     {
-        localPackageCache = appSettings.LocalPackageCache;
+        var result = Run();
+        AnsiConsole.WriteLine(result.Message.EscapeMarkup());
+        return result.Valid ? 0 : -1;
     }
 
-    public ModuleResult Run()
+    private ModuleResult Run()
     {
         try
         {

@@ -1,32 +1,44 @@
 ﻿using System.IO.Compression;
 using Develix.Essentials.Core;
 using Develix.Helper.Model;
+using Develix.Helper.Settings;
+using Spectre.Console;
+using Spectre.Console.Cli;
 
-namespace Develix.Helper.Modules;
+namespace Develix.Helper.Commands;
 
-public class PublishSetup(AppSettings appSettings, string setupName) : IModule
+public class PublishSetupCommand(AppSettings appSettings) : Command<PublishSetupSettings>
 {
-    private readonly string setupDirectoryIdentifier = appSettings.SetupDirectoryIdentifier;
-    private readonly string publishSetupRoot = appSettings.PublishSetupRoot;
-    private readonly string setupName = setupName;
+    private readonly AppSettings appSettings = appSettings;
 
-    public ModuleResult Run()
+    public override int Execute(CommandContext context, PublishSetupSettings settings)
     {
-        var setupDirectoryResult = GetSetupDirectory();
+        var result = Run(
+            settings.SetupName,
+            settings.PublishSetupRoot ?? appSettings.PublishSetupRoot,
+            settings.SetupDirectoryIdentifier ?? appSettings.SetupDirectoryIdentifier);
+
+        AnsiConsole.WriteLine(result.Message.EscapeMarkup());
+        return result.Valid ? 0 : -1;
+    }
+
+    private static ModuleResult Run(string setupName, string publishSetupRoot, string setupDirectoryIdentifier)
+    {
+        var setupDirectoryResult = GetSetupDirectory(setupDirectoryIdentifier);
         if (!setupDirectoryResult.Valid)
             return new(false, setupDirectoryResult.Message);
 
-        var publishDirectory = GetPublishDirectory();
+        var publishDirectory = GetPublishDirectory(setupName, publishSetupRoot);
         if (!publishDirectory.Valid)
             return new(false, publishDirectory.Message);
 
-        var publishResult = PublishZippedSetup(setupDirectoryResult.Value, publishDirectory.Value);
+        var publishResult = PublishZippedSetup(setupName, setupDirectoryResult.Value, publishDirectory.Value);
         return publishResult.Valid
             ? new(true, $"Published Setup '{setupName}' to '{publishSetupRoot}'")
             : new(false, publishResult.Message);
     }
 
-    private Result<string> GetSetupDirectory()
+    private static Result<string> GetSetupDirectory(string setupDirectoryIdentifier)
     {
         var root = Directory.GetCurrentDirectory();
         var subDirectories = Directory.GetDirectories(root, "*", SearchOption.AllDirectories);
@@ -36,7 +48,7 @@ public class PublishSetup(AppSettings appSettings, string setupName) : IModule
             : Result.Ok(setupDirectory);
     }
 
-    private Result<string> GetPublishDirectory()
+    private static Result<string> GetPublishDirectory(string setupName, string publishSetupRoot)
     {
         if (!Directory.Exists(publishSetupRoot))
             return Result.Fail<string>($"The publish setup root directory '{publishSetupRoot}' does not exist.");
@@ -46,7 +58,7 @@ public class PublishSetup(AppSettings appSettings, string setupName) : IModule
         return Result.Ok(fullPublishSetupPath);
     }
 
-    private Result PublishZippedSetup(string setupDirectory, string publishDirectory)
+    private static Result PublishZippedSetup(string setupName, string setupDirectory, string publishDirectory)
     {
         try
         {
