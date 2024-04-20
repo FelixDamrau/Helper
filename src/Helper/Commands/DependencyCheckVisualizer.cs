@@ -10,7 +10,7 @@ public static class DependencyCheckVisualizer
     public static void Show(IReadOnlyCollection<ProjectConflicts> conflicts, IReadOnlyCollection<Problem> problems)
     {
         IList<IRenderable> renderables = [];
-        if(problems.Count > 0)
+        if (problems.Count > 0)
             renderables.Add(RenderProblems(problems));
         if (conflicts.Count > 0)
             renderables.Add(RenderConflicts(conflicts));
@@ -59,9 +59,9 @@ public static class DependencyCheckVisualizer
 
     private static Rows RenderProblems(IReadOnlyCollection<Problem> problems)
     {
-        var header = new Markup($"Found {"problem".ToQuantity(problems.Count)}", new Style(foreground: Color.Red, decoration: Decoration.Bold ) );
+        var header = new Markup($"Found {"problem".ToQuantity(problems.Count)}", new Style(foreground: Color.Red, decoration: Decoration.Bold));
         var data = problems.Select(p => new Markup($"[bold]{p.Project.Path.EscapeMarkup()}[/]: {p.Description}"));
-        return new Rows([header, ..data]);
-        
+        return new Rows([header, .. data]);
+
     }
 }
