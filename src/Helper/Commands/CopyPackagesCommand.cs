@@ -15,8 +15,7 @@ public class CopyPackagesCommand : Command<CopyPackagesSettings>
     public override int Execute(CommandContext context, CopyPackagesSettings settings)
     {
         var result = Run();
-        AnsiConsole.WriteLine(result.Message.EscapeMarkup());
-        return result.Valid ? 0 : -1;
+        return ModuleResultRenderer.Display(result);
     }
 
     private ModuleResult Run()
