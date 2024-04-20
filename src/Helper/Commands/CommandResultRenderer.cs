@@ -3,9 +3,9 @@ using Spectre.Console;
 
 namespace Develix.Helper.Commands;
 
-public static class ModuleResultRenderer
+public static class CommandResultRenderer
 {
-    public static int Display(ModuleResult result)
+    public static int Display(CommandResult result)
     {
         var color = result.Valid ? Color.Grey.ToMarkup() : Color.Red.ToMarkup();
         AnsiConsole.Markup($"[{color}]{result.Message.EscapeMarkup()}[/]");

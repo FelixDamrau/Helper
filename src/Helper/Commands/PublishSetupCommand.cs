@@ -18,10 +18,10 @@ public class PublishSetupCommand(AppSettings appSettings) : Command<PublishSetup
             settings.PublishSetupRoot ?? appSettings.PublishSetupRoot,
             settings.SetupDirectoryIdentifier ?? appSettings.SetupDirectoryIdentifier);
 
-        return ModuleResultRenderer.Display(result);
+        return CommandResultRenderer.Display(result);
     }
 
-    private static ModuleResult Run(string setupName, string publishSetupRoot, string setupDirectoryIdentifier)
+    private static CommandResult Run(string setupName, string publishSetupRoot, string setupDirectoryIdentifier)
     {
         var setupDirectoryResult = GetSetupDirectory(setupDirectoryIdentifier);
         if (!setupDirectoryResult.Valid)
