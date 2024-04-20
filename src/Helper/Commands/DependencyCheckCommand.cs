@@ -3,7 +3,6 @@ using System.Text.Json;
 using Develix.Helper.Model;
 using Develix.Helper.Model.Dependencies;
 using Develix.Helper.Settings;
-using Humanizer;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -15,31 +14,29 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
     public override int Execute(CommandContext context, DependencyCheckSettings settings)
     {
+        AnsiConsole.MarkupLine("[b]Info:[/] Ensure that the dependencies and tools of the project are restored.");
         var result = Run(settings.WorkingDirectory ?? ".", settings.ExcludeProjects, settings.Framework);
-        AnsiConsole.WriteLine(result.Message.EscapeMarkup());
-        return result.Valid ? 0 : -1;
+        return CommandResultRenderer.Display(result);
     }
 
-    private ModuleResult Run(string workingDirectory, string? excludeProjects, string? framework)
+    private CommandResult Run(string workingDirectory, string? excludeProjects, string? framework)
     {
         var process = InitProcess(workingDirectory, framework);
         process.Start();
         var listPackageJson = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
         if (process.ExitCode != 0)
-            return new(false, $"Exit code is {process.ExitCode}");
+            return new(false, $"dotnet process failed. Exit code was {process.ExitCode}");
 
-        var dependencyCheckModel = JsonSerializer.Deserialize<DependencyCheckModel>(listPackageJson, serializerOptions)
-            ?? throw new InvalidOperationException($"Could not deserialize data model!");
+        var dependencyCheckModel = JsonSerializer.Deserialize<DependencyCheckModel>(listPackageJson, serializerOptions);
+        if(dependencyCheckModel is null)
+            return new(false, $"Could not deserialize {nameof(DependencyCheckModel)}.");
+
+        var resolver = InitResolver(excludeProjects, dependencyCheckModel);
+        var (conflicts, problems) = resolver.Analyze();
+        DependencyCheckVisualizer.Show(conflicts, problems);
         
-        var res = InitResolver(excludeProjects, dependencyCheckModel);
-        var conflictCount = res.ShowConflicts();
-
-        var message = $"""
-            {"project".ToQuantity(dependencyCheckModel.Projects?.Count ?? 0)} analyzed.
-            {"conflict".ToQuantity(conflictCount)} found.
-            """;
-        return new(true, message);
+        return new(true, "Dependency check done");
     }
 
     private static Process InitProcess(string workingDirectory, string? framework)
@@ -61,20 +58,11 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
     private static DependencyCheckResolver InitResolver(string? excludeProjects, DependencyCheckModel dependencyCheckModel)
     {
-        var resolver = new DependencyCheckResolver();
         var projects = dependencyCheckModel.Projects ?? [];
         var relevantProjects = excludeProjects is null
             ? projects
             : projects.Where(p => !p.Path.Contains(excludeProjects));
-        foreach (var project in relevantProjects)
-        {
-            foreach (var package in project.Frameworks?.First().TopLevelPackages ?? [])
-                resolver.Add(project, package);
 
-            foreach (var package in project.Frameworks?.First().TransitivePackages ?? [])
-                resolver.Add(project, package);
-        }
-
-        return resolver;
+        return new DependencyCheckResolver(relevantProjects);
     }
 }

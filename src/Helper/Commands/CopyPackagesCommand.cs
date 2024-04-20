@@ -15,16 +15,15 @@ public class CopyPackagesCommand : Command<CopyPackagesSettings>
     public override int Execute(CommandContext context, CopyPackagesSettings settings)
     {
         var result = Run();
-        AnsiConsole.WriteLine(result.Message.EscapeMarkup());
-        return result.Valid ? 0 : -1;
+        return CommandResultRenderer.Display(result);
     }
 
-    private ModuleResult Run()
+    private CommandResult Run()
     {
         try
         {
             if (!Directory.Exists(localPackageCache))
-                return new ModuleResult(false, $"The directory of the local package cache '{localPackageCache}' does not exist!");
+                return new CommandResult(false, $"The directory of the local package cache '{localPackageCache}' does not exist!");
 
             var directory = Directory.GetCurrentDirectory();
             var packageFiles = Directory.GetFiles(directory, "*.nupkg", SearchOption.AllDirectories);
@@ -39,11 +38,11 @@ public class CopyPackagesCommand : Command<CopyPackagesSettings>
                 var destinationFile = Path.Combine(localPackageCache, fileName);
                 File.Copy(filePath, destinationFile, true);
             }
-            return new ModuleResult(true, "package".ToQuantity(count) + " copied successfully.");
+            return new CommandResult(true, "package".ToQuantity(count) + " copied successfully.");
         }
         catch (Exception exception)
         {
-            return new ModuleResult(false, $"Copying packages failed. [{exception.Message}]");
+            return new CommandResult(false, $"Copying packages failed. [{exception.Message}]");
         }
     }
 }
