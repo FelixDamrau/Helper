@@ -37,7 +37,7 @@ public partial class DependencyCheckResolver
         }
     }
 
-    public (IReadOnlyCollection<ProjectConflicts> Conflicts, IReadOnlyCollection<Problem> Problems) Show()
+    public (IReadOnlyCollection<ProjectConflicts> Conflicts, IReadOnlyCollection<Problem> Problems) Analyze()
     {
         var conflicts = packageData
             .ToLookup(p => p.Id)

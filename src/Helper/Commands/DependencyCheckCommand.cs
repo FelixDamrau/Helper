@@ -32,7 +32,7 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
             return new(false, $"Could not deserialize {nameof(DependencyCheckModel)}.");
 
         var resolver = InitResolver(excludeProjects, dependencyCheckModel);
-        var (conflicts, problems) = resolver.Show();
+        var (conflicts, problems) = resolver.Analyze();
         DependencyCheckVisualizer.Show(conflicts, problems);
         
         return new(true, "Dependency check done");
