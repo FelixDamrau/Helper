@@ -14,6 +14,7 @@ public class DependencyCheckCommand : Command<DependencyCheckSettings>
 
     public override int Execute(CommandContext context, DependencyCheckSettings settings)
     {
+        AnsiConsole.MarkupLine("[b]Info:[/] Ensure that the dependencies and tools of the project are restored.");
         var result = Run(settings.WorkingDirectory ?? ".", settings.ExcludeProjects, settings.Framework);
         return CommandResultRenderer.Display(result);
     }
